@@ -7,7 +7,6 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ✅ Allow requests from frontend
 app.use(
   cors({
     origin: '*', // Allow all origins (for testing)
@@ -19,20 +18,25 @@ app.use(
 app.use(express.json());
 
 app.post('/roast', async (req, res) => {
-  const { message } = req.body;
+  const { message, mode } = req.body; // Add "mode"
 
   if (!message) {
     return res.status(400).json({ error: 'No message provided.' });
   }
 
+  const systemPrompt =
+    mode === 'roast-ai'
+      ? 'You are an AI that gets roasted by users. Respond with a funny comeback.'
+      : 'You are an AI that roasts users in a humorous way.';
+
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
-        model: 'gpt-4', // Change to "gpt-3.5-turbo" if needed
+        model: 'gpt-4',
         messages: [
-          { role: 'system', content: 'You are a funny AI that roasts users.' },
-          { role: 'user', content: `Roast me: "${message}"` },
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: message },
         ],
         max_tokens: 100,
       },
