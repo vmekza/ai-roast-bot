@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 5001;
 
 app.use(
   cors({
-    origin: '*', // Allow all origins (for testing)
+    origin: '*',
     methods: 'GET,POST',
     allowedHeaders: 'Content-Type,Authorization',
   })
@@ -18,16 +18,16 @@ app.use(
 app.use(express.json());
 
 app.post('/roast', async (req, res) => {
-  const { message, mode } = req.body; // Add "mode"
+  const { message, systemPrompt } = req.body;
 
-  if (!message) {
-    return res.status(400).json({ error: 'No message provided.' });
+  if (!message || !systemPrompt) {
+    return res.status(400).json({ error: 'Missing message or systemPrompt' });
   }
 
-  const systemPrompt =
-    mode === 'roast-ai'
-      ? 'You are an AI that gets roasted by users. Respond with a funny comeback.'
-      : 'You are an AI that roasts users in a humorous way.';
+  // const systemPrompt =
+  //   mode === 'roast-ai'
+  //     ? 'You are an AI that gets roasted by users. Respond with a funny comeback.'
+  //     : 'You are an AI that roasts users in a humorous way.';
 
   try {
     const response = await axios.post(
