@@ -1,22 +1,23 @@
-// src/components/RoastBot.js
-
+// RoastBot.js
 import React, { useState, useRef, useEffect } from 'react';
-import { getRoast } from '../api'; // your API call
-import { motion } from 'framer-motion'; // if you want animations here too
+import ToggleSwitch from './ToggleSwitch';
+import { getRoast } from '../api';
 
 export default function RoastBot() {
   const [userInput, setUserInput] = useState('');
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // For toggles:
   const [isRoastMode, setIsRoastMode] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
+
   const chatRef = useRef(null);
 
   useEffect(() => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // AI Speaks if voiceMode is ON
   const speakResponse = (text) => {
     if (!text || !voiceMode) return;
     const speech = new SpeechSynthesisUtterance(text);
@@ -27,7 +28,6 @@ export default function RoastBot() {
     window.speechSynthesis.speak(speech);
   };
 
-  // Speech-to-Text
   const handleVoiceInput = () => {
     const recognition =
       new window.webkitSpeechRecognition() || new window.SpeechRecognition();
@@ -44,7 +44,6 @@ export default function RoastBot() {
     };
   };
 
-  // Send message
   const sendMessage = async (message) => {
     if (!message.trim()) return;
     setLoading(true);
@@ -84,43 +83,29 @@ export default function RoastBot() {
     setMessages([]);
   };
 
+  // Toggle voice mode
+  const toggleVoiceMode = () => {
+    setVoiceMode(!voiceMode);
+  };
+
   return (
     <div className='flex flex-col max-w-lg mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-md mt-8'>
-      <h1 className='text-2xl font-bold text-center mb-4'>
-        AI RoastBot & Assistant
-      </h1>
-
-      {/* Roast Mode Toggle */}
-      <div className='flex justify-between items-center mb-4'>
-        <label className='flex items-center cursor-pointer'>
-          <input
-            type='checkbox'
-            className='hidden'
-            checked={isRoastMode}
-            onChange={toggleRoastMode}
-          />
-          <span className='ml-2'>
-            {isRoastMode ? '🔥 Roast Mode' : '🤖 Normal Mode'}
-          </span>
-        </label>
+      <div className='mb-4'>
+        <ToggleSwitch
+          checked={isRoastMode}
+          onChange={toggleRoastMode}
+          leftLabel='Normal'
+          rightLabel='Roast'
+        />
       </div>
-
-      {/* Voice Mode Toggle */}
-      <div className='flex justify-between items-center mb-4'>
-        <label className='flex items-center cursor-pointer'>
-          <input
-            type='checkbox'
-            className='hidden'
-            checked={voiceMode}
-            onChange={() => setVoiceMode(!voiceMode)}
-          />
-          <span className='ml-2'>
-            {voiceMode ? '🔊 Voice ON' : '🔇 Voice OFF'}
-          </span>
-        </label>
+      <div className='mb-4'>
+        <ToggleSwitch
+          checked={voiceMode}
+          onChange={toggleVoiceMode}
+          leftLabel='Voice OFF'
+          rightLabel='Voice ON'
+        />
       </div>
-
-      {/* Chat Messages */}
       <div className='h-80 overflow-y-auto border border-gray-700 p-3 rounded-lg mb-4'>
         {messages.map((msg, index) => (
           <div
@@ -140,8 +125,6 @@ export default function RoastBot() {
         ))}
         <div ref={chatRef}></div>
       </div>
-
-      {/* Input + Buttons */}
       <textarea
         className='w-full p-2 border border-gray-600 rounded bg-gray-800 text-white'
         placeholder='Type your message...'
@@ -160,7 +143,7 @@ export default function RoastBot() {
           className='flex-1 bg-purple-500 text-white p-2 rounded'
           onClick={handleVoiceInput}
         >
-          🎤 Speak
+          Speak
         </button>
       </div>
     </div>
