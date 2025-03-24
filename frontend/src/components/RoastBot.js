@@ -127,7 +127,7 @@ export default function RoastBot() {
       </div>
       <textarea
         className='w-full p-2 border border-gray-600 rounded bg-gray-800 text-white'
-        placeholder='Type your message...'
+        placeholder='Ask Bobbsey something...'
         value={userInput}
         onChange={(e) => setUserInput(e.target.value)}
       ></textarea>
