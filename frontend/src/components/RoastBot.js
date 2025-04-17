@@ -1,4 +1,3 @@
-// RoastBot.js
 import React, { useState, useRef, useEffect } from 'react';
 import ToggleSwitch from './ToggleSwitch';
 import { getRoast } from '../api';
@@ -89,62 +88,108 @@ export default function RoastBot() {
   };
 
   return (
-    <div className='flex flex-col max-w-lg mx-auto bg-gray-900 text-white p-6 rounded-lg shadow-md mt-8'>
-      <div className='mb-4'>
-        <ToggleSwitch
-          checked={isRoastMode}
-          onChange={toggleRoastMode}
-          leftLabel='Normal'
-          rightLabel='Roast'
-        />
-      </div>
-      <div className='mb-4'>
-        <ToggleSwitch
-          checked={voiceMode}
-          onChange={toggleVoiceMode}
-          leftLabel='Voice OFF'
-          rightLabel='Voice ON'
-        />
-      </div>
-      <div className='h-80 overflow-y-auto border border-gray-700 p-3 rounded-lg mb-4'>
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              msg.sender === 'user' ? 'justify-end' : 'justify-start'
-            }`}
-          >
-            <p
-              className={`p-3 my-1 rounded-lg max-w-xs text-white ${
-                msg.sender === 'user' ? 'bg-blue-500' : 'bg-gray-700'
+    <div className='flex items-center justify-center min-h-screen'>
+      <div className='flex flex-col w-[800px] bg-gray-900 text-white p-14 rounded-lg shadow-md mt-8'>
+        <div className='flex flex-row items-center justify-between mb-4'>
+          <div>
+            {/* Toggle Switches */}
+            <div className='mb-2'>
+              <ToggleSwitch
+                checked={isRoastMode}
+                onChange={toggleRoastMode}
+                leftLabel='Normal'
+                rightLabel='Roast'
+              />
+            </div>
+            <div className='mb-4'>
+              <ToggleSwitch
+                checked={voiceMode}
+                onChange={toggleVoiceMode}
+                leftLabel='Voice OFF'
+                rightLabel='Voice ON'
+              />
+            </div>
+          </div>
+          {/* Bobbsey Image and Mode Message */}
+          <div className='mb-4'>
+            {!isRoastMode ? (
+              // Normal Mode: Bobbsey on the left with message on the right
+              <div className='flex items-center'>
+                <lord-icon
+                  src='/bobbsey.json'
+                  trigger='loop'
+                  style={{ width: '100px', height: '100px' }}
+                ></lord-icon>
+                <p className='ml-4 text-xl font-semibold pr-2'>
+                  I am your professional assistant
+                </p>
+              </div>
+            ) : (
+              // Roast Mode: Message on the left and Bobbsey on the right
+              <div className='flex items-center justify-end'>
+                <p className='mr-4 text-xl font-semibold pr-2'>
+                  I am your roast manager
+                </p>
+                <lord-icon
+                  src='/roast-bobbsey.json'
+                  trigger='loop'
+                  style={{ width: '100px', height: '100px' }}
+                ></lord-icon>
+              </div>
+            )}
+          </div>
+        </div>
+        {/* Chat Messages */}
+        <div className='h-80 overflow-y-auto border border-gray-600 p-3 rounded-lg mb-4'>
+          {messages.map((msg, index) => (
+            <div
+              key={index}
+              className={`flex items-center ${
+                msg.sender === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
-              {msg.text}
-            </p>
-          </div>
-        ))}
-        <div ref={chatRef}></div>
-      </div>
-      <textarea
-        className='w-full p-2 border border-gray-600 rounded bg-gray-800 text-white'
-        placeholder='Ask Bobbsey something...'
-        value={userInput}
-        onChange={(e) => setUserInput(e.target.value)}
-      ></textarea>
-      <div className='flex gap-2 mt-3'>
-        <button
-          className='flex-1 bg-green-500 text-white p-2 rounded'
-          onClick={() => sendMessage(userInput)}
-          disabled={loading || !userInput.trim()}
-        >
-          Send
-        </button>
-        <button
-          className='flex-1 bg-purple-500 text-white p-2 rounded'
-          onClick={handleVoiceInput}
-        >
-          Speak
-        </button>
+              {msg.sender === 'ai' && (
+                <lord-icon
+                  src='/bobbsey.json'
+                  trigger='hover'
+                  style={{ width: '40px', height: '40px' }}
+                  className='mr-2'
+                ></lord-icon>
+              )}
+              <p
+                className={`p-3 my-1 rounded-lg max-w-xs text-white ${
+                  msg.sender === 'user' ? 'bg-blue-500' : 'bg-gray-700'
+                }`}
+              >
+                {msg.text}
+              </p>
+            </div>
+          ))}
+          <div ref={chatRef}></div>
+        </div>
+
+        {/* Input and Buttons */}
+        <textarea
+          className='w-full p-2 border border-gray-600 rounded bg-gray-800 text-white'
+          placeholder='Ask Bobbsey something...'
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+        ></textarea>
+        <div className='flex gap-2 mt-3'>
+          <button
+            className='flex-1 bg-green-500 text-white p-2 rounded'
+            onClick={() => sendMessage(userInput)}
+            disabled={loading || !userInput.trim()}
+          >
+            Send
+          </button>
+          <button
+            className='flex-1 bg-purple-500 text-white p-2 rounded'
+            onClick={handleVoiceInput}
+          >
+            Speak
+          </button>
+        </div>
       </div>
     </div>
   );
