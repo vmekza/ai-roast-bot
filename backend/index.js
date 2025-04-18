@@ -24,11 +24,6 @@ app.post('/roast', async (req, res) => {
     return res.status(400).json({ error: 'Missing message or systemPrompt' });
   }
 
-  // const systemPrompt =
-  //   mode === 'roast-ai'
-  //     ? 'You are an AI that gets roasted by users. Respond with a funny comeback.'
-  //     : 'You are an AI that roasts users in a humorous way.';
-
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/chat/completions',

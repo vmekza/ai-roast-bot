@@ -1,11 +1,8 @@
-// src/components/Onboarding.js
-
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
 import { useNavigate } from 'react-router-dom';
 
-/** Optional: Reusable tooltip if you want to keep the "tour step" feature. */
 function TourTooltip({ top, left, text, onNext }) {
   return (
     <motion.div
@@ -30,10 +27,8 @@ function TourTooltip({ top, left, text, onNext }) {
 export default function Onboarding() {
   const navigate = useNavigate();
 
-  // Controls whether we show the Bobbsey popup
   const [showPopup, setShowPopup] = useState(true);
 
-  // Tour step states (only if you still want the pointer tooltips)
   const [tourStep, setTourStep] = useState(0);
 
   // Positions for the pointer tooltips
@@ -41,7 +36,6 @@ export default function Onboarding() {
   const [voiceTogglePos] = useState({ top: 210, left: 100 });
   const [sendButtonPos] = useState({ top: 420, left: 300 });
 
-  // For the bobbsey "bubble" looping animation (if you still want it)
   const [isLooping, setIsLooping] = useState(true);
   const timers = useRef([]);
 
@@ -58,11 +52,9 @@ export default function Onboarding() {
 
   return (
     <div className='min-h-screen bg-gray-100 p-4 relative'>
-      {/* STEP A: The small "Hi, I'm Bobbsey" popup */}
       <AnimatePresence>
         {showPopup && (
           <motion.div className='relative w-full h-full'>
-            {/* Bobbsey JSON animation */}
             <motion.div
               initial={{ y: '-100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
@@ -76,7 +68,6 @@ export default function Onboarding() {
               ></lord-icon>
             </motion.div>
 
-            {/* Typed text & button on the RIGHT */}
             <motion.div
               initial={{ x: '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
@@ -103,10 +94,13 @@ export default function Onboarding() {
               />
               <div className='mt-4 text-right'>
                 <button
-                  className='bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600'
+                  className='bg-green-500 text-white px-4 py-2 rounded
+                  transition-all duration-300 ease-in-out
+                  hover:bg-[#135623]
+                  hover:scale-105'
                   onClick={() => navigate('/chat')}
                 >
-                  Take Me to the Chat!
+                  Take me to the chat!
                 </button>
               </div>
             </motion.div>
@@ -114,13 +108,6 @@ export default function Onboarding() {
         )}
       </AnimatePresence>
 
-      {/*
-        If you want the chat to appear *below* the popup (instead of a new route),
-        you could import <RoastBot /> and render it here.
-        But since we're doing routing, we won't show RoastBot here.
-      */}
-
-      {/* Example of pointer tooltips if you want them AFTER the popup is dismissed */}
       <AnimatePresence>
         {tourStep === 1 && (
           <TourTooltip
@@ -156,9 +143,6 @@ export default function Onboarding() {
         )}
       </AnimatePresence>
 
-      {/*
-        Optionally, if you want a "Go to Chat" button after the popup is closed:
-      */}
       {!showPopup && (
         <div className='text-center mt-8'>
           <button

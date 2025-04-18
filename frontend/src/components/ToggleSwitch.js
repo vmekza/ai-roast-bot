@@ -15,7 +15,7 @@ export default function ToggleSwitch({
         className={`
           absolute top-0 left-0 w-[100px] h-full rounded-full
           transition-transform duration-300
-          ${checked ? 'translate-x-full bg-red-500' : 'bg-blue-500'}
+          ${checked ? 'translate-x-full bg-[#ff9538]' : 'bg-[#9764C7]'}
         `}
       />
       <div className='relative flex items-center justify-between h-full px-2'>

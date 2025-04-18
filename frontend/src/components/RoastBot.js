@@ -53,10 +53,10 @@ export default function RoastBot() {
     ]);
 
     const systemPrompt = isRoastMode
-      ? `You are an AI comedian who ONLY gives funny and sarcastic roasts.
+      ? `Your name is Bobbsey. You are an AI comedian who ONLY gives funny and sarcastic roasts.
          You MUST NEVER answer questions or provide helpful information.
          Every response must be an insult, but lighthearted and playful.`
-      : `You are a professional AI assistant.
+      : `Your name is Bobbsey. You are a professional AI assistant.
          Help users with polite, clear answers.
          NEVER roast or insult the user.`;
 
@@ -138,7 +138,7 @@ export default function RoastBot() {
                   I am your roast manager
                 </p>
                 <lord-icon
-                  src='/roast-bobbsey.json'
+                  src='/bobbsey-roast.json'
                   trigger='loop'
                   style={{ width: '100px', height: '100px' }}
                 ></lord-icon>
@@ -158,7 +158,7 @@ export default function RoastBot() {
             >
               {msg.sender.startsWith('ai') && (
                 <lord-icon
-                  src={isRoastMode ? '/roast-bobbsey.json' : '/bobbsey.json'}
+                  src={isRoastMode ? '/bobbsey-roast.json' : '/bobbsey.json'}
                   trigger={msg.sender === 'ai-thinking' ? 'loop' : 'hover'}
                   style={{ width: '40px', height: '40px' }}
                   className='mr-2'
@@ -167,7 +167,7 @@ export default function RoastBot() {
               <p
                 className={`p-3 my-1 rounded-lg max-w-xs text-white ${
                   msg.sender === 'user'
-                    ? 'bg-blue-500'
+                    ? 'bg-[#0077b6]'
                     : msg.sender === 'ai-thinking'
                     ? 'bg-gray-600 italic'
                     : 'bg-gray-700'
@@ -212,7 +212,6 @@ export default function RoastBot() {
         </div>
       </div>
 
-      {/* Typing dots animation styles */}
       <style>{`
         .typing-dots {
           display: inline-block;
