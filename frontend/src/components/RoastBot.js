@@ -7,7 +7,6 @@ export default function RoastBot() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // For toggles:
   const [isRoastMode, setIsRoastMode] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
 
@@ -47,6 +46,12 @@ export default function RoastBot() {
     if (!message.trim()) return;
     setLoading(true);
 
+    setMessages((prev) => [
+      ...prev,
+      { text: message, sender: 'user' },
+      { text: 'thinking', sender: 'ai-thinking' },
+    ]);
+
     const systemPrompt = isRoastMode
       ? `You are an AI comedian who ONLY gives funny and sarcastic roasts.
          You MUST NEVER answer questions or provide helpful information.
@@ -56,33 +61,38 @@ export default function RoastBot() {
          NEVER roast or insult the user.`;
 
     try {
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
       const response = await getRoast(message, systemPrompt);
-      setMessages((prev) => [
-        ...prev,
-        { text: message, sender: 'user' },
-        { text: response, sender: 'ai' },
-      ]);
+
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = { text: response, sender: 'ai' };
+        return updated;
+      });
+
       if (voiceMode) speakResponse(response);
     } catch (error) {
       console.error('Error sending message:', error);
-      setMessages((prev) => [
-        ...prev,
-        { text: message, sender: 'user' },
-        { text: 'Oops, something went wrong.', sender: 'ai' },
-      ]);
+      setMessages((prev) => {
+        const updated = [...prev];
+        updated[updated.length - 1] = {
+          text: 'Oops, something went wrong.',
+          sender: 'ai',
+        };
+        return updated;
+      });
     }
 
     setUserInput('');
     setLoading(false);
   };
 
-  // Toggle roast mode => reset chat
   const toggleRoastMode = () => {
     setIsRoastMode(!isRoastMode);
     setMessages([]);
   };
 
-  // Toggle voice mode
   const toggleVoiceMode = () => {
     setVoiceMode(!voiceMode);
   };
@@ -92,7 +102,6 @@ export default function RoastBot() {
       <div className='flex flex-col w-[800px] bg-gray-900 text-white p-14 rounded-lg shadow-md mt-8'>
         <div className='flex flex-row items-center justify-between mb-4'>
           <div>
-            {/* Toggle Switches */}
             <div className='mb-2'>
               <ToggleSwitch
                 checked={isRoastMode}
@@ -110,10 +119,9 @@ export default function RoastBot() {
               />
             </div>
           </div>
-          {/* Bobbsey Image and Mode Message */}
+
           <div className='mb-4'>
             {!isRoastMode ? (
-              // Normal Mode: Bobbsey on the left with message on the right
               <div className='flex items-center'>
                 <lord-icon
                   src='/bobbsey.json'
@@ -125,7 +133,6 @@ export default function RoastBot() {
                 </p>
               </div>
             ) : (
-              // Roast Mode: Message on the left and Bobbsey on the right
               <div className='flex items-center justify-end'>
                 <p className='mr-4 text-xl font-semibold pr-2'>
                   I am your roast manager
@@ -139,6 +146,7 @@ export default function RoastBot() {
             )}
           </div>
         </div>
+
         {/* Chat Messages */}
         <div className='h-80 overflow-y-auto border border-gray-600 p-3 rounded-lg mb-4'>
           {messages.map((msg, index) => (
@@ -148,20 +156,32 @@ export default function RoastBot() {
                 msg.sender === 'user' ? 'justify-end' : 'justify-start'
               }`}
             >
-              {msg.sender === 'ai' && (
+              {msg.sender.startsWith('ai') && (
                 <lord-icon
-                  src='/bobbsey.json'
-                  trigger='hover'
+                  src={isRoastMode ? '/roast-bobbsey.json' : '/bobbsey.json'}
+                  trigger={msg.sender === 'ai-thinking' ? 'loop' : 'hover'}
                   style={{ width: '40px', height: '40px' }}
                   className='mr-2'
                 ></lord-icon>
               )}
               <p
                 className={`p-3 my-1 rounded-lg max-w-xs text-white ${
-                  msg.sender === 'user' ? 'bg-blue-500' : 'bg-gray-700'
+                  msg.sender === 'user'
+                    ? 'bg-blue-500'
+                    : msg.sender === 'ai-thinking'
+                    ? 'bg-gray-600 italic'
+                    : 'bg-gray-700'
                 }`}
               >
-                {msg.text}
+                {msg.sender === 'ai-thinking' ? (
+                  <span className='typing-dots'>
+                    <span className='dot'>.</span>
+                    <span className='dot'>.</span>
+                    <span className='dot'>.</span>
+                  </span>
+                ) : (
+                  msg.text
+                )}
               </p>
             </div>
           ))}
@@ -191,6 +211,21 @@ export default function RoastBot() {
           </button>
         </div>
       </div>
+
+      {/* Typing dots animation styles */}
+      <style>{`
+        .typing-dots {
+          display: inline-block;
+          font-size: 24px;
+          letter-spacing: 2px;
+          animation: blink 1s infinite;
+        }
+        @keyframes blink {
+          0% { opacity: 0.2; }
+          20% { opacity: 1; }
+          100% { opacity: 0.2; }
+        }
+      `}</style>
     </div>
   );
 }
