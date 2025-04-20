@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 function TourTooltip({ top, left, text, onNext }) {
   return (
     <motion.div
-      className='fixed bg-white text-black p-3 rounded shadow z-50 w-48'
+      className='absolute bg-white text-black p-3 rounded-lg shadow-lg z-50 w-48 max-w-[80vw] sm:w-56'
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
@@ -16,7 +16,7 @@ function TourTooltip({ top, left, text, onNext }) {
       <p className='text-sm mb-2'>{text}</p>
       <button
         onClick={onNext}
-        className='bg-blue-500 text-white px-2 py-1 rounded text-xs'
+        className='bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 transition'
       >
         Next
       </button>
@@ -26,16 +26,15 @@ function TourTooltip({ top, left, text, onNext }) {
 
 export default function Onboarding() {
   const navigate = useNavigate();
-
   const [showPopup, setShowPopup] = useState(true);
-
   const [tourStep, setTourStep] = useState(0);
 
-  // Positions for the pointer tooltips
-  const [roastTogglePos] = useState({ top: 160, left: 100 });
-  const [voiceTogglePos] = useState({ top: 210, left: 100 });
-  const [sendButtonPos] = useState({ top: 420, left: 300 });
+  // Responsive tooltip positions (percentages)
+  const [roastTogglePos] = useState({ top: '20%', left: '10%' });
+  const [voiceTogglePos] = useState({ top: '30%', left: '10%' });
+  const [sendButtonPos] = useState({ top: '60%', left: '40%' });
 
+  // Looping for icon animation
   const [isLooping, setIsLooping] = useState(true);
   const timers = useRef([]);
 
@@ -51,63 +50,54 @@ export default function Onboarding() {
   }, []);
 
   return (
-    <div className='min-h-screen bg-gray-100 p-4 relative'>
+    <div className='min-h-screen bg-gray-100 p-4 flex items-center justify-center relative overflow-hidden'>
       <AnimatePresence>
         {showPopup && (
-          <motion.div className='relative w-full h-full'>
+          <div className='flex flex-col-reverse lg:flex-row items-center justify-center gap-8 w-full max-w-4xl'>
+            {/* Bobbsey Icon */}
             <motion.div
               initial={{ y: '-100%', opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 2 }}
-              style={{ position: 'absolute', top: '250px', left: '10%' }}
+              transition={{ duration: 1.5 }}
             >
               <lord-icon
                 src='/bobbsey.json'
                 trigger='loop'
-                style={{ width: '300px', height: '300px' }}
-              ></lord-icon>
+                // base 200px (w-48), tablet 256px (sm:w-64), desktop 288px (lg:w-72)
+                className='w-48 h-48 sm:w-64 sm:h-64 lg:w-72 lg:h-72'
+              />
             </motion.div>
 
+            {/* Welcome Message */}
             <motion.div
               initial={{ x: '100%', opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 2, delay: 0.5 }}
-              style={{
-                position: 'absolute',
-                top: '220px',
-                left: '40%',
-                width: '40%',
-                backgroundColor: 'white',
-                padding: '20px',
-                borderRadius: '8px',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-              }}
+              transition={{ duration: 1.5, delay: 0.3 }}
+              className='w-full max-w-xl bg-white p-6 rounded-lg shadow-lg'
             >
               <Typewriter
                 words={[
                   'Hey, I’m Bobbsey! I can be your friendly assistant or your roast manager. Ready to begin?',
                 ]}
                 loop={1}
-                typeSpeed={70}
-                deleteSpeed={50}
-                delaySpeed={1000}
+                typeSpeed={60}
+                deleteSpeed={40}
+                delaySpeed={800}
               />
               <div className='mt-4 text-right'>
                 <button
-                  className='bg-green-500 text-white px-4 py-2 rounded
-                  transition-all duration-300 ease-in-out
-                  hover:bg-[#135623]
-                  hover:scale-105'
+                  className='bg-green-500 text-white px-4 py-2 rounded-lg transition ease-in-out duration-200 hover:bg-green-600 hover:scale-105'
                   onClick={() => navigate('/chat')}
                 >
                   Take me to the chat!
                 </button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
+      {/* Tour Tooltips */}
       <AnimatePresence>
         {tourStep === 1 && (
           <TourTooltip
@@ -135,18 +125,19 @@ export default function Onboarding() {
         )}
         {tourStep === 4 && (
           <TourTooltip
-            top={250}
-            left={200}
+            top='50%'
+            left='30%'
             text='That’s it! Enjoy the bot!'
             onNext={() => setTourStep(0)}
           />
         )}
       </AnimatePresence>
 
+      {/* Fallback Button */}
       {!showPopup && (
         <div className='text-center mt-8'>
           <button
-            className='bg-green-500 text-white px-4 py-2 rounded'
+            className='bg-green-500 text-white px-4 py-2 rounded-lg'
             onClick={() => navigate('/chat')}
           >
             Go to the Chat
