@@ -1,5 +1,9 @@
 # Bobbsey Chat Bot
 
+## Live Demo
+
+Check it out here: https://bobbsey.netlify.app
+
 **Bobbsey** is a React-based chat application that features a friendly AI assistant who can switch between **Normal** and **Roast** modes.
 
 ## Features
@@ -8,8 +12,6 @@
 - **Voice Input & Output**: Speak to Bobbsey and have responses read aloud.
 - **Typing Animation**: Realistic “thinking…” indicator with animated dots.
 - **Responsive Design**: Mobile‑first layout that scales smoothly up to desktop.
-
-## Demo
 
 ## Getting Started
 
@@ -27,10 +29,8 @@ cd ai-roast-bot
 ```bash
 cd backend
 npm install
-cp .env.example .env        # copy example env file
-# Edit .env and set your OpenAI API key:
-# OPENAI_API_KEY=your_api_key_here
-npm start                    # starts the server on http://localhost:5000
+cp .env.example .env
+npm start
 ```
 
 #### Frontend
@@ -38,5 +38,5 @@ npm start                    # starts the server on http://localhost:5000
 ```bash
 cd frontend
 npm install
-npm start                    # starts React app on http://localhost:3000
+npm start
 ```

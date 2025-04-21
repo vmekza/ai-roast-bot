@@ -11,6 +11,6 @@ export const getRoast = async (message, systemPrompt) => {
     return response.data.roast;
   } catch (error) {
     console.error('API Error:', error);
-    return 'Oops! Something went wrong with the roast.';
+    return 'Oops! Something went wrong...';
   }
 };
