@@ -4,7 +4,7 @@
 
 Check it out here: https://bobbsey.netlify.app
 
-**Bobbsey** is a React-based chat application that features a friendly AI assistant who can switch between **Normal** and **Roast** modes.
+**Bobbsey** is a React-based chat application that features a friendly AI assistant who can switch between Normal and Roast modes.
 
 ## Features
 
