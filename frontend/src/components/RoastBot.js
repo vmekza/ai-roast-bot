@@ -8,7 +8,6 @@ export default function RoastBot() {
   const [loading, setLoading] = useState(false);
   const [isRoastMode, setIsRoastMode] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-
   const chatRef = useRef(null);
 
   useEffect(() => {
@@ -30,21 +29,14 @@ export default function RoastBot() {
       new window.webkitSpeechRecognition() || new window.SpeechRecognition();
     recognition.lang = 'en-US';
     recognition.start();
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setUserInput(transcript);
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech Recognition Error:', event.error);
-    };
+    recognition.onresult = (e) => setUserInput(e.results[0][0].transcript);
+    recognition.onerror = (e) =>
+      console.error('Speech Recognition Error:', e.error);
   };
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
     setLoading(true);
-
     setMessages((prev) => [
       ...prev,
       { text: message, sender: 'user' },
@@ -52,158 +44,131 @@ export default function RoastBot() {
     ]);
 
     const systemPrompt = isRoastMode
-      ? `Your name is Bobbsey. You are an AI comedian who ONLY gives funny and sarcastic roasts.
-         You MUST NEVER answer questions or provide helpful information.
-         Every response must be an insult, but lighthearted and playful.`
-      : `Your name is Bobbsey. You are a professional AI assistant.
-         Help users with polite, clear answers.
-         NEVER roast or insult the user.`;
+      ? `Your name is Bobbsey. You are an AI comedian who ONLY gives funny and sarcastic roasts.`
+      : `Your name is Bobbsey. You are a professional AI assistant.`;
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      await new Promise((res) => setTimeout(res, 1500));
       const response = await getRoast(message, systemPrompt);
-
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1] = { text: response, sender: 'ai' };
-        return updated;
-      });
-
+      setMessages((prev) =>
+        prev.slice(0, -1).concat({ text: response, sender: 'ai' })
+      );
       if (voiceMode) speakResponse(response);
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setMessages((prev) => {
-        const updated = [...prev];
-        updated[updated.length - 1] = {
-          text: 'Oops, something went wrong.',
-          sender: 'ai',
-        };
-        return updated;
-      });
+    } catch {
+      setMessages((prev) =>
+        prev
+          .slice(0, -1)
+          .concat({ text: 'Oops, something went wrong.', sender: 'ai' })
+      );
     }
 
     setUserInput('');
     setLoading(false);
   };
 
-  const toggleRoastMode = () => {
-    setIsRoastMode(!isRoastMode);
-    setMessages([]);
-  };
-
-  const toggleVoiceMode = () => {
-    setVoiceMode(!voiceMode);
-  };
-
   return (
-    <div className='flex items-center justify-center min-h-screen'>
-      <div className='flex flex-col w-[800px] bg-gray-900 text-white p-14 rounded-lg shadow-md mt-8'>
-        <div className='flex flex-row items-center justify-between mb-4'>
-          <div>
-            <div className='mb-2'>
-              <ToggleSwitch
-                checked={isRoastMode}
-                onChange={toggleRoastMode}
-                leftLabel='Normal'
-                rightLabel='Roast'
-              />
-            </div>
-            <div className='mb-4'>
-              <ToggleSwitch
-                checked={voiceMode}
-                onChange={toggleVoiceMode}
-                leftLabel='Voice OFF'
-                rightLabel='Voice ON'
-              />
-            </div>
+    <div className='min-h-screen bg-gray-200 p-4 flex items-center justify-center'>
+      <div className='w-full max-w-md md:max-w-xl lg:max-w-2xl bg-gray-800 text-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 flex flex-col'>
+        {/* Header: toggles & mode info */}
+        <div className='flex flex-col sm:flex-row items-center justify-between mb-4 space-y-4 sm:space-y-0'>
+          <div className='flex flex-col w-full sm:w-auto space-y-4'>
+            <ToggleSwitch
+              checked={isRoastMode}
+              onChange={() => {
+                setIsRoastMode(!isRoastMode);
+                setMessages([]);
+              }}
+              leftLabel='Normal'
+              rightLabel='Roast'
+            />
+            <ToggleSwitch
+              checked={voiceMode}
+              onChange={() => setVoiceMode(!voiceMode)}
+              leftLabel='Voice OFF'
+              rightLabel='Voice ON'
+            />
           </div>
-
-          <div className='mb-4'>
+          <div className='flex items-center space-x-2 w-full sm:w-auto justify-center'>
             {!isRoastMode ? (
-              <div className='flex items-center'>
+              <>
                 <lord-icon
                   src='/bobbsey.json'
                   trigger='loop'
-                  style={{ width: '100px', height: '100px' }}
-                ></lord-icon>
-                <p className='ml-4 text-xl font-semibold pr-2'>
+                  className='w-12 h-12 sm:w-16 sm:h-16'
+                />
+                <p className='text-sm sm:text-base md:text-lg font-semibold'>
                   I am your professional assistant
                 </p>
-              </div>
+              </>
             ) : (
-              <div className='flex items-center justify-end'>
-                <p className='mr-4 text-xl font-semibold pr-2'>
+              <>
+                <p className='text-sm sm:text-base md:text-lg font-semibold'>
                   I am your roast manager
                 </p>
                 <lord-icon
                   src='/bobbsey-roast.json'
                   trigger='loop'
-                  style={{ width: '100px', height: '100px' }}
-                ></lord-icon>
-              </div>
+                  className='w-12 h-12 sm:w-16 sm:h-16'
+                />
+              </>
             )}
           </div>
         </div>
 
-        {/* Chat Messages */}
-        <div className='h-80 overflow-y-auto border border-gray-600 p-3 rounded-lg mb-4'>
-          {messages.map((msg, index) => (
+        {/* Chat area */}
+        <div className='flex-1 bg-gray-700 rounded-lg p-3 overflow-y-auto mb-4'>
+          {messages.map((msg, idx) => (
             <div
-              key={index}
-              className={`flex items-center ${
+              key={idx}
+              className={`flex ${
                 msg.sender === 'user' ? 'justify-end' : 'justify-start'
-              }`}
+              } mb-2`}
             >
-              {msg.sender.startsWith('ai') && (
+              {msg.sender !== 'user' && (
                 <lord-icon
                   src={isRoastMode ? '/bobbsey-roast.json' : '/bobbsey.json'}
                   trigger={msg.sender === 'ai-thinking' ? 'loop' : 'hover'}
-                  style={{ width: '40px', height: '40px' }}
-                  className='mr-2'
-                ></lord-icon>
+                  className='w-8 h-8 mr-2'
+                />
               )}
-              <p
-                className={`p-3 my-1 rounded-lg max-w-xs text-white ${
+              <span
+                className={`px-3 py-2 rounded-lg max-w-xs break-words ${
                   msg.sender === 'user'
-                    ? 'bg-[#0077b6]'
+                    ? 'bg-blue-600'
                     : msg.sender === 'ai-thinking'
                     ? 'bg-gray-600 italic'
-                    : 'bg-gray-700'
+                    : 'bg-gray-800'
                 }`}
               >
                 {msg.sender === 'ai-thinking' ? (
-                  <span className='typing-dots'>
-                    <span className='dot'>.</span>
-                    <span className='dot'>.</span>
-                    <span className='dot'>.</span>
-                  </span>
+                  <span className='typing-dots'>...</span>
                 ) : (
                   msg.text
                 )}
-              </p>
+              </span>
             </div>
           ))}
-          <div ref={chatRef}></div>
+          <div ref={chatRef} />
         </div>
 
-        {/* Input and Buttons */}
+        {/* Input & buttons */}
         <textarea
-          className='w-full p-2 border border-gray-600 rounded bg-gray-800 text-white'
+          rows={3}
+          className='w-full bg-gray-800 text-white p-2 rounded-lg mb-3 border border-gray-600 resize-none'
           placeholder='Ask Bobbsey something...'
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
-        ></textarea>
-        <div className='flex gap-2 mt-3'>
+        />
+        <div className='flex flex-col sm:flex-row gap-2'>
           <button
-            className='flex-1 bg-green-500 text-white p-2 rounded'
+            className='flex-1 bg-green-500 py-2 rounded-lg transition hover:bg-green-600 disabled:opacity-50'
             onClick={() => sendMessage(userInput)}
             disabled={loading || !userInput.trim()}
           >
             Send
           </button>
           <button
-            className='flex-1 bg-purple-500 text-white p-2 rounded'
+            className='flex-1 bg-purple-500 py-2 rounded-lg transition hover:bg-purple-600'
             onClick={handleVoiceInput}
           >
             Speak
@@ -212,17 +177,8 @@ export default function RoastBot() {
       </div>
 
       <style>{`
-        .typing-dots {
-          display: inline-block;
-          font-size: 24px;
-          letter-spacing: 2px;
-          animation: blink 1s infinite;
-        }
-        @keyframes blink {
-          0% { opacity: 0.2; }
-          20% { opacity: 1; }
-          100% { opacity: 0.2; }
-        }
+        .typing-dots { display: inline-block; animation: blink 1s infinite; }
+        @keyframes blink { 0%,100% { opacity:0.2;} 50%{ opacity:1;} }
       `}</style>
     </div>
   );

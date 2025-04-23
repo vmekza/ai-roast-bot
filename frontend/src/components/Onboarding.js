@@ -21,7 +21,7 @@ export default function Onboarding() {
   }, []);
 
   return (
-    <div className='min-h-screen bg-gray-100 p-4 flex items-center justify-center relative overflow-hidden'>
+    <div className='min-h-screen bg-gray-200 p-4 flex items-center justify-center relative overflow-hidden'>
       <AnimatePresence>
         {showPopup && (
           <div className='flex flex-col-reverse lg:flex-row items-center justify-center gap-8 w-full max-w-4xl'>
