@@ -30,7 +30,6 @@ export default function RoastBot() {
     if (!text || !voiceMode || voices.length === 0) return;
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
-    // pick a sensible English voice if available
     utter.voice = voices.find((v) => v.lang.startsWith('en')) || voices[0];
     utter.rate = 1.1;
     utter.pitch = 1;
@@ -50,12 +49,16 @@ export default function RoastBot() {
 
   const sendMessage = async (message) => {
     if (!message.trim()) return;
+
     setLoading(true);
+
     setMessages((prev) => [
       ...prev,
       { text: message, sender: 'user' },
       { text: 'thinking', sender: 'ai-thinking' },
     ]);
+
+    setUserInput('');
 
     const systemPrompt = isRoastMode
       ? `Your name is Bobbsey. You are an AI comedian who ONLY gives funny and sarcastic roasts.`
@@ -64,20 +67,21 @@ export default function RoastBot() {
     try {
       await new Promise((res) => setTimeout(res, 1500));
       const response = await getRoast(message, systemPrompt);
+
       setMessages((prev) =>
         prev.slice(0, -1).concat({ text: response, sender: 'ai' })
       );
-      // now that voices are loaded, Safari will speak
+
       if (voiceMode) speakResponse(response);
     } catch {
       setMessages((prev) =>
-        prev
-          .slice(0, -1)
-          .concat({ text: 'Oops, something went wrong.', sender: 'ai' })
+        prev.slice(0, -1).concat({
+          text: 'Oops, something went wrong.',
+          sender: 'ai',
+        })
       );
     }
 
-    setUserInput('');
     setLoading(false);
   };
 
