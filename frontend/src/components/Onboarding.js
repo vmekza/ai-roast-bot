@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
 import { useNavigate } from 'react-router-dom';
 
 export default function Onboarding() {
   const navigate = useNavigate();
-  const [showPopup, setShowPopup] = useState(true);
-  const [isLooping, setIsLooping] = useState(true);
+  const [showPopup] = useState(true);
+  const [setIsLooping] = useState(true);
   const timers = useRef([]);
 
   useEffect(() => {
