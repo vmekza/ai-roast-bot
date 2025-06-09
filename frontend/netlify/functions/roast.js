@@ -1,6 +1,7 @@
-import { post } from 'axios';
+// frontend/netlify/functions/roast.js
+const axios = require('axios');
 
-export async function handler(event) {
+exports.handler = async (event) => {
   try {
     const { prompt, systemPrompt } = JSON.parse(event.body || '{}');
     if (!prompt || !systemPrompt) {
@@ -10,7 +11,8 @@ export async function handler(event) {
       };
     }
 
-    const openaiRes = await post(
+    // call OpenAI
+    const openaiRes = await axios.post(
       'https://api.openai.com/v1/chat/completions',
       {
         model: 'gpt-4',
@@ -35,13 +37,10 @@ export async function handler(event) {
       body: JSON.stringify({ roast }),
     };
   } catch (err) {
-    console.error(
-      '🛑 roast function error:',
-      err.response?.data || err.message
-    );
+    console.error('Roast function error:', err.response?.data || err.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Oops! Something went wrong...' }),
     };
   }
-}
+};
