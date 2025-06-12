@@ -26,15 +26,36 @@ export default function RoastBot() {
     return () => synth.removeEventListener('voiceschanged', load);
   }, []);
 
+  // const speakResponse = (text) => {
+  //   if (!text || !voiceMode || voices.length === 0) return;
+  //   const utter = new SpeechSynthesisUtterance(text);
+  //   utter.lang = 'en-US';
+  //   utter.voice = voices.find((v) => v.lang.startsWith('en')) || voices[0];
+  //   utter.rate = 1.1;
+  //   utter.pitch = 1;
+  //   utter.volume = 1;
+  //   window.speechSynthesis.speak(utter);
+  // };
+
   const speakResponse = (text) => {
-    if (!text || !voiceMode || voices.length === 0) return;
+    if (!text || !voiceMode) return;
+
+    const synth = window.speechSynthesis;
+    const voices = synth.getVoices();
+    if (!voices.length) {
+      synth.addEventListener('voiceschanged', () => speakResponse(text), {
+        once: true,
+      });
+      return;
+    }
+
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
     utter.voice = voices.find((v) => v.lang.startsWith('en')) || voices[0];
     utter.rate = 1.1;
     utter.pitch = 1;
     utter.volume = 1;
-    window.speechSynthesis.speak(utter);
+    synth.speak(utter);
   };
 
   const handleVoiceInput = () => {
@@ -181,7 +202,17 @@ export default function RoastBot() {
         <div className='flex flex-col sm:flex-row gap-2'>
           <button
             className='flex-1 bg-green-500 py-2 rounded-lg transition hover:bg-green-600 disabled:opacity-50'
-            onClick={() => sendMessage(userInput)}
+            // onClick={() => sendMessage(userInput)}
+            // disabled={loading || !userInput.trim()}
+
+            onClick={() => {
+              if (voiceMode) {
+                const unlock = new SpeechSynthesisUtterance('');
+                window.speechSynthesis.speak(unlock);
+              }
+              sendMessage(userInput);
+              setUserInput('');
+            }}
             disabled={loading || !userInput.trim()}
           >
             Send

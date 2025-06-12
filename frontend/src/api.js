@@ -6,6 +6,6 @@ export async function getRoast(prompt, systemPrompt) {
     { prompt, systemPrompt },
     { timeout: 30000 }
   );
-  // return only the roast field:
+
   return data.roast;
 }
