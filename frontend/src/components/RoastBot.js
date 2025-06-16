@@ -8,7 +8,7 @@ export default function RoastBot() {
   const [loading, setLoading] = useState(false);
   const [isRoastMode, setIsRoastMode] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [voices, setVoices] = useState([]);
+  const [setVoices] = useState([]);
   const chatRef = useRef(null);
 
   useEffect(() => {
