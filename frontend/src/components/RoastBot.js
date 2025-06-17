@@ -8,41 +8,18 @@ export default function RoastBot() {
   const [loading, setLoading] = useState(false);
   const [isRoastMode, setIsRoastMode] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [setVoices] = useState([]);
   const chatRef = useRef(null);
 
   useEffect(() => {
     chatRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  useEffect(() => {
-    const synth = window.speechSynthesis;
-    const load = () => {
-      const available = synth.getVoices();
-      if (available.length) setVoices(available);
-    };
-    load();
-    synth.addEventListener('voiceschanged', load);
-    return () => synth.removeEventListener('voiceschanged', load);
-  }, []);
-
-  // const speakResponse = (text) => {
-  //   if (!text || !voiceMode || voices.length === 0) return;
-  //   const utter = new SpeechSynthesisUtterance(text);
-  //   utter.lang = 'en-US';
-  //   utter.voice = voices.find((v) => v.lang.startsWith('en')) || voices[0];
-  //   utter.rate = 1.1;
-  //   utter.pitch = 1;
-  //   utter.volume = 1;
-  //   window.speechSynthesis.speak(utter);
-  // };
-
   const speakResponse = (text) => {
     if (!text || !voiceMode) return;
 
     const synth = window.speechSynthesis;
-    const voices = synth.getVoices();
-    if (!voices.length) {
+    const availableVoices = synth.getVoices();
+    if (!availableVoices.length) {
       synth.addEventListener('voiceschanged', () => speakResponse(text), {
         once: true,
       });
@@ -51,7 +28,9 @@ export default function RoastBot() {
 
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = 'en-US';
-    utter.voice = voices.find((v) => v.lang.startsWith('en')) || voices[0];
+    utter.voice =
+      availableVoices.find((v) => v.lang.startsWith('en')) ||
+      availableVoices[0];
     utter.rate = 1.1;
     utter.pitch = 1;
     utter.volume = 1;
@@ -87,13 +66,14 @@ export default function RoastBot() {
 
     try {
       await new Promise((res) => setTimeout(res, 1500));
-      const response = await getRoast(message, systemPrompt);
+      const roastText = await getRoast(message, systemPrompt);
 
+      // swap the “thinking” bubble for the AI reply
       setMessages((prev) =>
-        prev.slice(0, -1).concat({ text: response, sender: 'ai' })
+        prev.slice(0, -1).concat({ text: roastText, sender: 'ai' })
       );
 
-      if (voiceMode) speakResponse(response);
+      if (voiceMode) speakResponse(roastText);
     } catch {
       setMessages((prev) =>
         prev.slice(0, -1).concat({
@@ -109,7 +89,7 @@ export default function RoastBot() {
   return (
     <div className='min-h-screen bg-gray-00 p-4 flex items-center justify-center'>
       <div className='w-full max-w-md md:max-w-xl lg:max-w-2xl bg-gray-800 text-white rounded-lg shadow-lg p-4 sm:p-6 md:p-8 flex flex-col'>
-        {/* Header: toggles & mode info */}
+        {/* Header toggles */}
         <div className='flex flex-col sm:flex-row items-center justify-between mb-4 space-y-4 sm:space-y-0'>
           <div className='flex flex-col w-full sm:w-auto space-y-4'>
             <ToggleSwitch
@@ -202,16 +182,12 @@ export default function RoastBot() {
         <div className='flex flex-col sm:flex-row gap-2'>
           <button
             className='flex-1 bg-green-500 py-2 rounded-lg transition hover:bg-green-600 disabled:opacity-50'
-            // onClick={() => sendMessage(userInput)}
-            // disabled={loading || !userInput.trim()}
-
             onClick={() => {
               if (voiceMode) {
-                const unlock = new SpeechSynthesisUtterance('');
-                window.speechSynthesis.speak(unlock);
+                // “unlock” TTS on mobile
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
               }
               sendMessage(userInput);
-              setUserInput('');
             }}
             disabled={loading || !userInput.trim()}
           >
