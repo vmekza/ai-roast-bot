@@ -68,7 +68,6 @@ export default function RoastBot() {
       await new Promise((res) => setTimeout(res, 1500));
       const roastText = await getRoast(message, systemPrompt);
 
-      // swap the “thinking” bubble for the AI reply
       setMessages((prev) =>
         prev.slice(0, -1).concat({ text: roastText, sender: 'ai' })
       );
@@ -184,7 +183,6 @@ export default function RoastBot() {
             className='flex-1 bg-green-500 py-2 rounded-lg transition hover:bg-green-600 disabled:opacity-50'
             onClick={() => {
               if (voiceMode) {
-                // “unlock” TTS on mobile
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
               }
               sendMessage(userInput);
