@@ -26,7 +26,7 @@ npm install
 
 2. **Set your OpenAI key**
 
-Create a **.env file in frontend/**:
+Create a **.env file** in **frontend/**:
 
 ```bash
 echo "OPENAI_API_KEY=sk-…" > .env
